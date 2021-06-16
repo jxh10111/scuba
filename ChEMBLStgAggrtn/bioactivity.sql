@@ -42,9 +42,11 @@ GO
 --Execution time: 13s
 --CTAS molecular hierarchy
 CREATE TABLE mini.p_bioactivity AS 
-    (SELECT ba.assay_id, ba.assay_type, ba.bao_format, ba.tid, ba.target_type, ba.bao_endpoint, ba.standard_type
+    (SELECT ba.assay_id, ba.assay_type, ba.bao_format, ba.tid, ba.target_type
+            , ba.molecule_type, ba.max_phase, ba.prodrug
+            , ba.bao_endpoint, ba.standard_type
             , ba.molregno, ba.chembl_id, mh.parent_molregno, mh.active_molregno
-            , ba.molecule_type, ba.max_phase, ba.standard_relation, ba.standard_value, ba.standard_units, ba.pchembl_value
+            , ba.standard_relation, ba.standard_value, ba.standard_units, ba.pchembl_value
             , ba.standard_upper_value, ba.standard_text_value, ba.standard_flag, ba.assay_measurement 
     FROM mini.bioactivity ba
         INNER JOIN molecule_hierarchy mh
@@ -53,9 +55,11 @@ GO
 --Execution time: 12s
 --CTAS parent_chembl_id into bioactivity
 CREATE TABLE mini.pc_bioactivity AS (
-    SELECT ba.assay_id, ba.assay_type, ba.bao_format, ba.tid, ba.target_type, ba.bao_endpoint, ba.standard_type
+    SELECT ba.assay_id, ba.assay_type, ba.bao_format, ba.tid, ba.target_type
+            , ba.molecule_type, ba.max_phase, ba.prodrug
+            , ba.bao_endpoint, ba.standard_type
             , ba.molregno, ba.chembl_id, ba.parent_molregno, md.chembl_id as parent_chembl_id, ba.active_molregno
-            , ba.molecule_type, ba.max_phase, ba.standard_relation, ba.standard_value, ba.standard_units, ba.pchembl_value
+            , ba.standard_relation, ba.standard_value, ba.standard_units, ba.pchembl_value
             , ba.standard_upper_value, ba.standard_text_value, ba.standard_flag, ba.assay_measurement
 	FROM mini.p_bioactivity ba
     INNER JOIN molecule_dictionary md
@@ -65,9 +69,11 @@ GO
 --Execution time: 12s
 --CTAS active_chembl_id into bioactivity
 CREATE TABLE mini.pca_bioactivity AS (
-    SELECT ba.assay_id, ba.assay_type, ba.bao_format, ba.tid, ba.target_type, ba.bao_endpoint, ba.standard_type
+    SELECT ba.assay_id, ba.assay_type, ba.bao_format, ba.tid, ba.target_type
+            , ba.molecule_type, ba.max_phase, ba.prodrug
+            , ba.bao_endpoint, ba.standard_type
             , ba.molregno, ba.chembl_id, ba.parent_molregno, parent_chembl_id, ba.active_molregno, md.chembl_id as  active_chembl_id
-            , ba.molecule_type, ba.max_phase, ba.standard_relation, ba.standard_value, ba.standard_units, ba.pchembl_value
+            , ba.standard_relation, ba.standard_value, ba.standard_units, ba.pchembl_value
             , ba.standard_upper_value, ba.standard_text_value, ba.standard_flag, ba.assay_measurement
 	FROM mini.pc_bioactivity ba
     INNER JOIN molecule_dictionary md
@@ -75,4 +81,15 @@ CREATE TABLE mini.pca_bioactivity AS (
 )
 GO
 --Execution time: 12s
---drop and replace
+--Cleanup and END triage
+DROP TABLE mini.bioactivity
+GO
+CREATE TABLE mini.bioactivity AS SELECT * FROM mini.pca_bioactivity
+GO
+DROP TABLE mini.p_bioactivity
+GO
+DROP TABLE mini.pc_bioactivity
+GO
+DROP TABLE mini.pca_bioactivity
+GO
+--Run 13 scripts Total Execution time: 2m 1s
