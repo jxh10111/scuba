@@ -24,4 +24,19 @@ UPDATE mini.bioactivity
 	WHERE standard_type = 'Inihibition'
 GO
 --Execution time: 1s
---
+--Add assay_measurement
+ALTER TABLE mini.bioactivity
+	ADD COLUMN assay_measurement varchar(25)
+GO
+--Execution time: 3ms
+--Update assay_measurement
+UPDATE mini.bioactivity 
+	SET assay_measurement='single concentration'
+	WHERE standard_type IN ('Inhibition', 'Activity', 'Emax', '% Control', 'Residual Activity', 'Residual activity', '% Ctrl', 'Inhibition (% of control)', 'Activation (% of control)')
+GO
+--Execution time: 3s
+UPDATE mini.bioactivity 
+	SET assay_measurement='concentration response'
+	WHERE standard_type IN ('Ki', 'EC50', 'IC50', 'Potency', 'AC50', 'Kd', 'Kd apparent')
+GO
+--Execution time: 13s
