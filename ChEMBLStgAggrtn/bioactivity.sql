@@ -3,6 +3,7 @@ CREATE TABLE mini.bioactivity AS (
 SELECT a.assay_id, a.assay_type, a.bao_format
 , t.tid, t.target_type, act.bao_endpoint, act.standard_type
 , mol.molecule_type, mol.max_phase, mol.prodrug
+, act.molregno, mol.chembl_id
 , act.standard_relation, act.standard_value, act.standard_units
 , act.pchembl_value, act.standard_upper_value, act.standard_text_value, act.standard_flag
     FROM public.assays a
