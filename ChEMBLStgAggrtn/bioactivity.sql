@@ -15,7 +15,9 @@ SELECT a.assay_id, a.assay_type, a.bao_format
         ON act.molregno = mol.molregno
     WHERE t.target_type = 'SINGLE PROTEIN'
     AND act.standard_type IN ('Potency', 'IC50', 'Ki', 'Inhibition', 'Inihibition', 'Inhibition (% of control)', 'EC50', 'AC50', 'Activity', 'Kd', 'Residual Activity', 'Residual activity','Kd apparent', '% Control', '% Ctrl', 'Activation (% of control)', 'Emax')
-    AND mol.molecule_type NOT IN ('Antibody', 'Cell', 'Enzyme', 'Gene', 'Oligonucleotide', 'Oligosaccharide', 'Protein'))
+    AND (mol.molecule_type NOT IN ('Antibody', 'Cell', 'Enzyme', 'Gene', 'Oligonucleotide', 'Oligosaccharide', 'Protein')
+        OR mol.molecule_type is NULL)
+)
 GO
 --Execution time: 26s
 --Update standard_type typo for “Inihibition”  
@@ -92,4 +94,4 @@ DROP TABLE mini.pc_bioactivity
 GO
 DROP TABLE mini.pca_bioactivity
 GO
---Run 13 scripts Total Execution time: 2m 1s
+--Run 13 scripts Total Execution time: 2m 11s
