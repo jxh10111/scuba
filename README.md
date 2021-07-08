@@ -1,2 +1,2 @@
 # scuba
-Small MoleCUle BioActivity [SCUBA}
+Small MoleCUle BioActivity [SCUBA]
