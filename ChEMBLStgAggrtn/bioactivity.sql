@@ -96,44 +96,68 @@ DROP TABLE mini.pca_bioactivity
 GO
 --Run 13 scripts Total Execution time: 2m 11s
 
+CREATE TABLE mini.bioactivity_cmp AS (
+SELECT b.assay_id
+, b.assay_type
+, b.bao_format
+, b.tid
+, b.target_type
+, b.molecule_type
+, b.max_phase
+, b.prodrug
+, b.bao_endpoint
+, b.standard_type
+, b.molregno
+, b.chembl_id
+, b.parent_molregno
+, b.parent_chembl_id
+, b.active_molregno
+, b.active_chembl_id
+, c.component_id
+, b.standard_relation
+, b.standard_value
+, b.standard_units
+, b.pchembl_value
+, b.standard_upper_value
+, b.standard_text_value
+, b.standard_flag
+, b.assay_measurement
+    FROM mini.bioactivity_cmp b
+    INNER JOIN public.target_components c
+        ON b.tid = c.tid)
+GO
 
---- create table more similar to schema stephan requested
-
-CREATE TABLE mini.bioactivity_single AS (
-	SELECT
-   row_number() over () as activity_id,
-   a.assay_id,
-   act.molregno as molecule_id,
-   t.tid as target_id,
-   act.standard_type as endpoint,
-   act.pchembl_value as concentration_pvalue,
-   act.bao_endpoint as activity_measure,
-   act.standard_relation as endpoint_value_relation,
-   act.standard_value as endpoint_value,
-   act.standard_units as endpoint_unit
-  , a.assay_type, a.bao_format 
-	, t.tid, t.target_type, act.bao_endpoint, act.standard_type
-	, mol.molecule_type, mol.max_phase, mol.prodrug 
-	, act.molregno, mol.chembl_id 
-	, act.standard_relation, act.standard_value, act.standard_units 
-	, act.pchembl_value, act.standard_upper_value, act.standard_text_value, act.standard_flag,smile.canonical_smiles, 
-	 'ChEMBL' as source 
-	FROM public.assays a 
-							INNER JOIN public.activities act 
-	ON a.assay_id = act.assay_id 
-							INNER JOIN public.target_dictionary t 
-	ON a.tid = t.tid 
-							INNER JOIN public.molecule_dictionary mol 
-	ON act.molregno = mol.molregno  
-							INNER JOIN public.compound_structures smile 
-	ON act.molregno = smile.molregno 
-							WHERE t.target_type = 'SINGLE PROTEIN' 
-	AND act.standard_type IN ('Ki', 'EC50', 'IC50', 'Potency', 'AC50', 'Kd', 'Kd apparent') 
-							AND (mol.molecule_type NOT IN ('Antibody', 'Cell', 'Enzyme', 'Gene', 'Oligonucleotide', 'Oligosaccharide', 'Protein') 
-	OR mol.molecule_type is NULL)
-)
-
-
-Time: 28.074s
-
-Affected rows: 5465019
+CREATE TABLE mini.bioactivity_protein AS (
+SELECT b.assay_id
+, b.assay_type
+, b.bao_format
+, b.tid
+, b.target_type
+, b.molecule_type
+, b.max_phase
+, b.prodrug
+, b.bao_endpoint
+, b.standard_type
+, b.molregno
+, b.chembl_id
+, b.parent_molregno
+, b.parent_chembl_id
+, b.active_molregno
+, b.active_chembl_id
+, b.component_id
+, cs.component_type
+, cs.accession
+, cs.tax_id
+, cs.organism
+, b.standard_relation
+, b.standard_value
+, b.standard_units
+, b.pchembl_value
+, b.standard_upper_value
+, b.standard_text_value
+, b.standard_flag
+, b.assay_measurement
+    FROM mini.bioactivity_cmp b
+    INNER JOIN public.component_sequences cs
+        ON b.component_id = cs.component_id)
+GO
