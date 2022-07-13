@@ -161,3 +161,22 @@ SELECT b.assay_id
     INNER JOIN public.component_sequences cs
         ON b.component_id = cs.component_id)
 GO
+
+CREATE TABLE mini.pbioactivity AS(
+SELECT parent_chembl_id, accession, organism, assay_measurement, standard_type, standard_relation
+--, PERCENTILE_CONT(0.5) WITHIN GROUP(ORDER BY standard_value) as msv
+, count(*)
+, round((-LOG(PERCENTILE_CONT(0.5) WITHIN GROUP(ORDER BY standard_value)/1000000000))::numeric, 2) as nlogvalm
+/* assay_id,     assay_type
+, parent_chembl_id
+, accession, organism
+,     assay_measurement
+, standard_type, standard_relation,     standard_value,     standard_units,     pchembl_value,     standard_upper_value,     standard_text_value     
+, standard_flag
+*/
+FROM mini.bioactivity_protein
+WHERE standard_value IS NOT NULL
+AND standard_value != 0
+GROUP BY parent_chembl_id, accession, organism, assay_measurement, standard_type, standard_relation
+)
+GO
