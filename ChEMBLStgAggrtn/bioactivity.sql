@@ -97,86 +97,48 @@ GO
 --Run 13 scripts Total Execution time: 2m 11s
 
 CREATE TABLE mini.bioactivity_cmp AS (
-SELECT b.assay_id
-, b.assay_type
-, b.bao_format
-, b.tid
-, b.target_type
-, b.molecule_type
-, b.max_phase
-, b.prodrug
-, b.bao_endpoint
-, b.standard_type
-, b.molregno
-, b.chembl_id
-, b.parent_molregno
-, b.parent_chembl_id
-, b.active_molregno
-, b.active_chembl_id
-, c.component_id
-, b.standard_relation
-, b.standard_value
-, b.standard_units
-, b.pchembl_value
-, b.standard_upper_value
-, b.standard_text_value
-, b.standard_flag
-, b.assay_measurement
+SELECT b.assay_id, b.assay_type, b.bao_format, b.tid, b.target_type, b.molecule_type, b.max_phase, b.prodrug
+, b.bao_endpoint, b.standard_type, b.molregno, b.chembl_id, b.parent_molregno, b.parent_chembl_id, b.active_molregno, b.active_chembl_id
+, c.component_id, b.standard_relation, b.standard_value, b.standard_units, b.pchembl_value, b.standard_upper_value, b.standard_text_value, b.standard_flag, b.assay_measurement
     FROM mini.bioactivity_cmp b
     INNER JOIN public.target_components c
         ON b.tid = c.tid)
 GO
 
 CREATE TABLE mini.bioactivity_protein AS (
-SELECT b.assay_id
-, b.assay_type
-, b.bao_format
-, b.tid
-, b.target_type
-, b.molecule_type
-, b.max_phase
-, b.prodrug
-, b.bao_endpoint
-, b.standard_type
-, b.molregno
-, b.chembl_id
-, b.parent_molregno
-, b.parent_chembl_id
-, b.active_molregno
-, b.active_chembl_id
-, b.component_id
-, cs.component_type
-, cs.accession
-, cs.tax_id
-, cs.organism
-, b.standard_relation
-, b.standard_value
-, b.standard_units
-, b.pchembl_value
-, b.standard_upper_value
-, b.standard_text_value
-, b.standard_flag
-, b.assay_measurement
+SELECT b.assay_id, b.assay_type, b.bao_format, b.tid, b.target_type, b.molecule_type, b.max_phase, b.prodrug
+, b.bao_endpoint, b.standard_type, b.molregno, b.chembl_id, b.parent_molregno, b.parent_chembl_id, b.active_molregno, b.active_chembl_id
+, b.component_id, cs.component_type, cs.accession, cs.tax_id, cs.organism, b.standard_relation, b.standard_value, b.standard_units
+, b.pchembl_value, b.standard_upper_value, b.standard_text_value, b.standard_flag, b.assay_measurement
     FROM mini.bioactivity_cmp b
     INNER JOIN public.component_sequences cs
         ON b.component_id = cs.component_id)
 GO
 
+DROP TABLE mini.bioactivity_cmp
+GO
+
+
+CREATE TABLE mini.pbioactivity_tmp AS(
+	SELECT parent_chembl_id, accession, organism, assay_measurement, standard_type, standard_relation
+		, PERCENTILE_CONT(0.5) WITHIN GROUP(ORDER BY standard_value)/1000000000 as msv
+		, count(*) as num_val
+	FROM mini.bioactivity_protein
+	GROUP BY parent_chembl_id, accession, organism, assay_measurement, standard_type, standard_relation
+	)
+GO
+
+DELETE FROM mini.pbioactivity_tmp
+	WHERE msv IS NULL
+	AND msv = 0
+GO
+
 CREATE TABLE mini.pbioactivity AS(
-SELECT parent_chembl_id, accession, organism, assay_measurement, standard_type, standard_relation
---, PERCENTILE_CONT(0.5) WITHIN GROUP(ORDER BY standard_value) as msv
-, count(*)
-, round((-LOG(PERCENTILE_CONT(0.5) WITHIN GROUP(ORDER BY standard_value)/1000000000))::numeric, 2) as nlogvalm
-/* assay_id,     assay_type
-, parent_chembl_id
-, accession, organism
-,     assay_measurement
-, standard_type, standard_relation,     standard_value,     standard_units,     pchembl_value,     standard_upper_value,     standard_text_value     
-, standard_flag
-*/
-FROM mini.bioactivity_protein
-WHERE standard_value IS NOT NULL
-AND standard_value != 0
-GROUP BY parent_chembl_id, accession, organism, assay_measurement, standard_type, standard_relation
+	SELECT parent_chembl_id, accession, organism, assay_measurement, standard_type, standard_relation, num_val
+	, round(-LOG(msv)::numeric, 2) as nlogvalm
+	FROM mini.pbioactivity_tmp
 )
+GO
+
+DROP TABLE mini.pbioactivity_tmp
 GO
