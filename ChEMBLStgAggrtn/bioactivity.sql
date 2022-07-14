@@ -100,7 +100,7 @@ CREATE TABLE mini.bioactivity_cmp AS (
 SELECT b.assay_id, b.assay_type, b.bao_format, b.tid, b.target_type, b.molecule_type, b.max_phase, b.prodrug
 , b.bao_endpoint, b.standard_type, b.molregno, b.chembl_id, b.parent_molregno, b.parent_chembl_id, b.active_molregno, b.active_chembl_id
 , c.component_id, b.standard_relation, b.standard_value, b.standard_units, b.pchembl_value, b.standard_upper_value, b.standard_text_value, b.standard_flag, b.assay_measurement
-    FROM mini.bioactivity_cmp b
+    FROM mini.bioactivity b
     INNER JOIN public.target_components c
         ON b.tid = c.tid)
 GO
@@ -117,7 +117,7 @@ GO
 
 DROP TABLE mini.bioactivity_cmp
 GO
-
+-- Execution time 39 seconds
 
 CREATE TABLE mini.pbioactivity_tmp AS(
 	SELECT parent_chembl_id, accession, organism, assay_measurement, standard_type, standard_relation
@@ -128,9 +128,17 @@ CREATE TABLE mini.pbioactivity_tmp AS(
 	)
 GO
 
+--Execution time 1m 3s
+
 DELETE FROM mini.pbioactivity_tmp
 	WHERE msv IS NULL
-	AND msv = 0
+GO
+
+DELETE FROM mini.pbioactivity_tmp
+	WHERE msv = 0
+GO
+DELETE FROM mini.pbioactivity_tmp
+	WHERE msv < 0
 GO
 
 CREATE TABLE mini.pbioactivity AS(
@@ -139,6 +147,16 @@ CREATE TABLE mini.pbioactivity AS(
 	FROM mini.pbioactivity_tmp
 )
 GO
-
+--Execution time 10s
+UPDATE mini.pbioactivity 	SET standard_relation = '>'	WHERE standard_relation = '<'
+GO
+UPDATE mini.pbioactivity 	SET standard_relation = '>='	WHERE standard_relation = '<='
+GO
+UPDATE mini.pbioactivity 	SET standard_relation = '<'	WHERE standard_relation = '>'
+GO
+UPDATE mini.pbioactivity 	SET standard_relation = '<='	WHERE standard_relation = '>='
+GO
+UPDATE mini.pbioactivity 	SET standard_relation = '<<'	WHERE standard_relation = '>>'
+GO
 DROP TABLE mini.pbioactivity_tmp
 GO
