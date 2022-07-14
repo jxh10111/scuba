@@ -148,15 +148,25 @@ CREATE TABLE mini.pbioactivity AS(
 )
 GO
 --Execution time 10s
-UPDATE mini.pbioactivity 	SET standard_relation = '>'	WHERE standard_relation = '<'
+UPDATE mini.pbioactivity 	SET standard_relation = 'n>'	WHERE standard_relation = '<'
 GO
-UPDATE mini.pbioactivity 	SET standard_relation = '>='	WHERE standard_relation = '<='
+UPDATE mini.pbioactivity 	SET standard_relation = 'n>='	WHERE standard_relation = '<='
 GO
-UPDATE mini.pbioactivity 	SET standard_relation = '<'	WHERE standard_relation = '>'
+UPDATE mini.pbioactivity 	SET standard_relation = 'n<'	WHERE standard_relation = '>'
 GO
-UPDATE mini.pbioactivity 	SET standard_relation = '<='	WHERE standard_relation = '>='
+UPDATE mini.pbioactivity 	SET standard_relation = 'n<='	WHERE standard_relation = '>='
 GO
-UPDATE mini.pbioactivity 	SET standard_relation = '<<'	WHERE standard_relation = '>>'
+UPDATE mini.pbioactivity 	SET standard_relation = 'n<<'	WHERE standard_relation = '>>'
+GO
+UPDATE mini.pbioactivity 	SET standard_relation = '>'	WHERE standard_relation = 'n>'
+GO
+UPDATE mini.pbioactivity 	SET standard_relation = '>='	WHERE standard_relation = 'n>='
+GO
+UPDATE mini.pbioactivity 	SET standard_relation = '<'	WHERE standard_relation = 'n<'
+GO
+UPDATE mini.pbioactivity 	SET standard_relation = '<='	WHERE standard_relation = 'n<='
+GO
+UPDATE mini.pbioactivity 	SET standard_relation = '<<'	WHERE standard_relation = 'n<<'
 GO
 DROP TABLE mini.pbioactivity_tmp
 GO
