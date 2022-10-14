@@ -1,5 +1,9 @@
 <<< Updated on Oct 13, 2022 >>>
 
+PLP protocol location:
+Pipeline Pilot -> Protocols tab -> JHu -> ChEMBL31_Q122KKB_Aggregation -> ChEMBL31_TABLESforChEMBLdb
+
+
 For the aggregated ChEMBL tables uploaded on Chembl db: 
 
 First method:
@@ -43,3 +47,8 @@ Caclualting median using different endpoints
 Steps:
 1) The procedures are the same from above, except, when grouping, use ‘pchembl_id’, ‘accession’, ‘Gene_KKB’, and ‘standard_type’ instead. 
    Together there are 504,937 datapoints in this table. 
+
+
+
+
+
