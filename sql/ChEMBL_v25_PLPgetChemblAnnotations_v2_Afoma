@@ -1,4 +1,0 @@
-SELECT public.target_dictionary.chembl_id as chembl_target_id,public.drug_mechanism.mechanism_of_action,public.drug_mechanism.molecular_mechanism,public.drug_mechanism.mechanism_comment,public.drug_mechanism.selectivity_comment,public.drug_mechanism.binding_site_comment,public.drug_mechanism.action_type
-FROM public.target_dictionary,public.molecule_dictionary,public.drug_mechanism
-WHERE public.molecule_dictionary.molregno = public.drug_mechanism.molregno
-AND public.target_dictionary.tid = public.drug_mechanism.tid
