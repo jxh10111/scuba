@@ -1,0 +1,44 @@
+<<< Updated on Oct 26, 2022 >>>
+
+PLP protocol location:
+Pipeline Pilot -> Protocols tab -> JHu -> ChEMBL31_Q122KKB_Aggregation -> MakeTable_for_KAKI_KAPI_allendpoints & MakeTable_for_KAKI_KAPI_differentendpoints
+
+For the aggregated ChEMBL and KKB tables uploaded on ChEMBL31 db: 
+
+Following the procedure after solely ChEMBL and KKB aggregation documentation:
+(Using first method for both databases)
+(aggregated table can be accessed from aggregate.chembl31_and_q122kkb_median_all_endpoints in ChEMBL31 db)
+
+Steps:  
+
+1. Take ChEMBL datapoints with activity values and KKB datapoints with activity values, 
+   join them together using accession, Gene_KKB target, and canonical smiles, and put them in a cache. 
+   (Note: overlap between ChEMBL and KKB is ~150k datapoints)
+2. Do the same thing for ChEMBL and KKB caches without activity value, and put them in a separate cache. 
+3. Aggregate again for these two caches to have an almost finalized ChEMBL and KKB aggregation file (1,048,040). 
+4. After we remove the datapoints that has pval_uplimit and pval_lowlimit conflicts (558), 
+   there are 1,047,482 datapoints in the final production. 
+
+
+
+(Using second method for both databases)
+(aggregated table can be accessed from aggregate.chembl31_and_q122kkb_median_by_endpoints in ChEMBL31 db)
+
+Steps:  
+
+1. Same procedure as shown in steps above, except we keep parent_chembl_id and MR_id for both ChEMBL and KKB datasets for aggregation.
+   The endpoint types from both datasets will also appear in the final production. 
+   After aggregation there are 1,084,561 datapoints. 
+2. After I removed datapoints with uplimit/lowlimit conflict (612), 
+   it ends up with 1,083,949 datapoints in final production. 
+
+
+
+Note:
+1. chembl: 484 unique targets, 270,519 datapoints, 137,650 unique smiles
+2. kkb: 505 unique targets, 809,838 datapoints, 327,786 unique smiles
+3. aggregated chembl and kkb: 512 unique targets, 1,047,482 datapoints, 436,601 unique smiles
+(512 unique targets decrease to 423 unique targets after removing targets with less than 10 actives)
+4. overlap btw kkb and chembl: 477 targets, 32,875 datapoints, 28,835 smiles
+
+

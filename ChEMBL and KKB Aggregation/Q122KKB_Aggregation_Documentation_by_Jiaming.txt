@@ -1,0 +1,47 @@
+<<< Updated on Oct 26, 2022 >>>
+
+PLP protocol location:
+Pipeline Pilot -> Protocols tab -> JHu -> ChEMBL31_Q122KKB_Aggregation -> Q122KKB_TABLESonChEMBLdb
+
+
+For the aggregated KKB tables uploaded on ChEMBL31 db: 
+
+First method:
+Calculating median using all endpoints 
+(original data were gathered from the latest Q122 KKB database given by Dr.Schürer)
+(aggregated table can be accessed from aggregate.q122kkb_median_all_endpoints in ChEMBL31 db)
+
+Steps: 
+1) From the Q122_KB_SAR.txt file, get unique AP_ID (41,390) for those records that a) have defined ASSAYTARGET, and b) ASSAYTYPE = Enzyme assay. 
+2) From AssayProtocols.txt, keep AP_IDs for mutants (1,114) based on description in AP_Name and AP_Procedure.
+3) Add the molecular weight to the hash table MR_ID_MWT using the MR_ID in Q122_KB_SAR.sdf.gz.
+4) Start from Q122_KB_SAR.sdf.gz file, apply conditions: 
+   a) ASSAYTARGET is defined and ASSAYTARGET ne ‘’; 
+   b) ASSAYTYPE = Enzyme assay; 
+   c) remove mutants by joining AP_IDs for mutants; 
+   d) ASSAYMEASURE = 'IC50' or ASSAYMEASURE = 'Ki' or ASSAYMEASURE = 'Kd' or ASSAYMEASURE = ‘EC50’.
+5) For ASSAYMEASURE with pvalues, keep the pvalues for further aggregation; 
+   for those without pvalues, calculate their pvalues based on their standard value and their units; 
+   calculate pvalues for upper and lower limits with different relations (e.g. <, <=, >, >=, between). 
+6) Datapoints with activity values (including pval, pval_uplimit, pval_lowlimit) will be saved in a cache; 
+   those values that are not greater than 0 or without any defined value will be saved in another cache (518).
+7) Generate canonical smiles from AssayMolecules.txt file.
+8) Join canonical smiles and KKB targets to the two caches above using MR_ID and Gene_KKB.
+9) Then group and aggregate to calculate for the medians for pval, pval_uplimit, and pval_lowlimit. 
+   After aggregation, there are 783,513 datapoints in the final prodiction for Q122KKB aggregation.
+
+
+
+Second method:
+Calculating median using different endpoints 
+(data were gathered from the latest Q122 KKB database given by Dr.Schürer)
+(aggregated table can be accessed from aggregate.q122kkb_median_by_endpoints in ChEMBL31 db)
+
+Steps:
+1) The procedures are the same from above, except, when grouping, use ‘MR_ID’, ‘accession’, ‘Gene_KKB’, ‘AssayMeasure’ instead. 
+   Together there are 796,011 datapoints in this table. 
+
+
+
+
+

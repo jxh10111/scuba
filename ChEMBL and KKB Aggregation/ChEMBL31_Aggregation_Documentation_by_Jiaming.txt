@@ -1,0 +1,53 @@
+<<< Updated on Oct 26, 2022 >>>
+
+PLP protocol location:
+Pipeline Pilot -> Protocols tab -> JHu -> ChEMBL31_Q122KKB_Aggregation -> ChEMBL31_TABLESforChEMBLdb
+
+
+For the aggregated ChEMBL tables uploaded on Chembl31 db: 
+
+First method:
+Calculating median using all endpoints 
+(data can be accessed from aggregate.median_all_endpoints in ChEMBL31 db)
+
+Steps: 
+1) Collect everything in mini.bioactivity_protein table, smiles from public.compound_structures table, 
+    and confidence score from public.assays using SQL select in PLP
+2) Join smiles and keep records with confidence score >= 5
+3) Apply filters: a) target type = ‘single protein’; b) molecule_type = ‘small molecule’; 
+   c) organism = 'Homo sapiens’; d) assay_measurement = 'concentration response’; 
+   e) standard_type = 'IC50' or standard_type = 'Kd' or standard_type = 'Ki' or standard_type = 'EC50' or standard_type = 'Potency' or standard_type = ‘AC50’.
+4) Generate canonical smiles from original smiles
+5) Use accession to join with KKB targets
+6) Split the dataset into 4 scenarios: 
+    a) both standard_value and pvalue defined; 
+    b) none of the standard_value nor pvalue defined; 
+    c) standard_value is defined but pvalue is not; 
+    d) standard_value is not defined but pvalue is defined.
+7) For records in a): standard_value will be removed and left with only pvalue
+8) For records in b): will be saved in a separate cache
+9) For records in c): filter for unit=nM only, and standardize relation < and <= only, 
+   compute pvalues based on standard_values, and rename pvalues as 'pval'. 
+   Split the dataset into two groups: pval and pvalue_lowerlimit. 
+10) For records in d): keep pvalues
+11) Records in a) and d) will be combined and the column name ‘pchembl_value’ will be renamed to ‘pval’ to maintain consistency. 
+12) The combination of a) and d) after renaming will be grouped by ‘pchembl_id’, ‘accession’, and Gene_KKB’, 
+    and then aggregated together with ‘pval’ from c) to calculate for pval_median 
+    (Note: pval is defined and pval > 0 is applied before aggregation, those filtered out will be combined with b) and saved in the same cache). 
+13) The pvalue_lowerlimit from c) will be aggregated using the same approach as mentioned in line 12, 
+    and pvalue_lowerlimit_median will be calculated. 
+14) The aggregated records from a), c), and d) will then combined with the records saved in the cache. 
+    Together there are 497,781 datapoints in this table. 
+
+
+Second method:
+Caclualting median using different endpoints 
+(data can be accessed from aggregate.median_by_endpoints in ChEMBL31 db)
+
+Steps:
+1) The procedures are the same from above, except, when grouping, use ‘pchembl_id’, ‘accession’, ‘Gene_KKB’, and ‘standard_type’ instead. 
+   Together there are 504,937 datapoints in this table. 
+
+
+
+
